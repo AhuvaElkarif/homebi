@@ -1,9 +1,10 @@
 // getting-started.js
 const mongoose = require('mongoose');
+const {config} = require("../config/secret");
 
 main().catch(err => console.log(err));
 
 async function main() {
-  await mongoose.connect('mongodb://127.0.0.1:27017/beKind');
-  console.log("beKind connect");
+  await mongoose.connect(`mongodb+srv://${config.userDb}:${config.passDb}@cluster0.dm7bgmk.mongodb.net/`);
+  console.log("toysStore atlas connect");
 }

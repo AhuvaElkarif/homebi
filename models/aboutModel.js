@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
-const jwt = require("jsonwebtoken");
 
-const BuildingSchema = new mongoose.Schema({
+const aboutSchema = new mongoose.Schema({
     header:String,
     context:String,
     date_created: {
@@ -10,23 +9,13 @@ const BuildingSchema = new mongoose.Schema({
     }
 });
 
-exports.UserModel = mongoose.model("buildings", userSchema);
+exports.AboutModel = mongoose.model("abouts", aboutSchema);
 
-exports.userValid = (_reqBody) => {
+exports.aboutValid = (_reqBody) => {
     let joiSchema = Joi.object({
-        city: Joi.string().min(2).max(50).required(),
-        street: Joi.string().min(2).max(50).required(),
-        numHouse: Joi.string().min(2).max(100).email().required(),
-        numEntry: Joi.string().min(6).max(50).required(),
-        numApartment: Joi.number().required(),
-        phone: Joi.string().min(9).max(10).required(),
-        paymentType: Joi.boolean().min(9).max(10).required(),
+        header: Joi.string().min(2).max(50).required(),
+        context: Joi.string().min(2).max(10000).required(),
     });
     return joiSchema.validate(_reqBody);
-}
-
-exports.genToken = (_userId) => {
-    let token = jwt.sign({ _id: _userId }, "secret", { expiresIn: "60min" });
-    return token;
 }
 

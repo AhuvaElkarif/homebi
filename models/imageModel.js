@@ -1,26 +1,23 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
-const jwt = require("jsonwebtoken");
 
-const imagesSchema = new mongoose.Schema({
-    build_id:String,
+const imageSchema = new mongoose.Schema({
+    buildId:String,
     image:String,
+    status: {
+        type: Boolean, default: true
+    },
     date_created: {
         type: Date, default: Date.now()
     }
 });
 
-exports.ImageMoel = mongoose.model("images", imagesSchema);
+exports.ImageModel = mongoose.model("images", imageSchema);
 
-exports.userValid = (_reqBody) => {
+exports.imageValid = (_reqBody) => {
     let joiSchema = Joi.object({
         image: Joi.string().min(2).max(50000).required(),
+        buildId: Joi.string().required(),
     });
     return joiSchema.validate(_reqBody);
 }
-
-exports.genToken = (_userId) => {
-    let token = jwt.sign({ _id: _userId }, "secret", { expiresIn: "60min" });
-    return token;
-}
-

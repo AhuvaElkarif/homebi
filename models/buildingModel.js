@@ -1,14 +1,13 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
-const jwt = require("jsonwebtoken");
-
-const BuildingSchema = new mongoose.Schema({
+//do regex
+const buildingSchema = new mongoose.Schema({
     city: String,
     street: String,
     numHouse: String,
     numEntry: String,
     zipCode: String,
-    numApartments: Date,
+    numApartments: String,
     paymentType: Boolean,
     paymentFees: Number,
     userId:String,
@@ -18,23 +17,20 @@ const BuildingSchema = new mongoose.Schema({
     }
 });
 
-exports.UserModel = mongoose.model("buildings", userSchema);
+exports.BuildingModel = mongoose.model("buildings", buildingSchema);
 
-exports.userValid = (_reqBody) => {
+exports.buildingValid = (_reqBody) => {
     let joiSchema = Joi.object({
         city: Joi.string().min(2).max(50).required(),
         street: Joi.string().min(2).max(50).required(),
-        numHouse: Joi.string().min(2).max(100).email().required(),
-        numEntry: Joi.string().min(6).max(50).required(),
-        numApartment: Joi.number().required(),
-        phone: Joi.string().min(9).max(10).required(),
-        paymentType: Joi.boolean().min(9).max(10).required(),
+        numHouse: Joi.string().numeric().positive().max(4).required(),
+        numEntry: Joi.string().numeric().positive().max(2).required(),
+        zipCode: Joi.string().numeric().positive().max(20).required(),
+        numApartment: Joi.string().numeric().positive().max(0).required(),
+        paymentType: Joi.boolean().required(),
+        paymentFees: Joi.number().positive().required(),
+        isCompany: Joi.boolean().required(),
     });
     return joiSchema.validate(_reqBody);
-}
-
-exports.genToken = (_userId) => {
-    let token = jwt.sign({ _id: _userId }, "secret", { expiresIn: "60min" });
-    return token;
 }
 

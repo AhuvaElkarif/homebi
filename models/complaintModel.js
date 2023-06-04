@@ -1,35 +1,30 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
-const jwt = require("jsonwebtoken");
 
 const complaintSchema = new mongoose.Schema({
-    user_id: String,
+    userId: String,
+    buildId:String,
     deacription: String,
     image:String,
     video:String,
-    is_handled:Boolean,
+    isHandled:Boolean,
+    status: {
+        type: Boolean, default: true
+    },
     date_created: {
         type: Date, default: Date.now()
     }
 });
 
-exports.UserModel = mongoose.model("complaints", complaintSchema);
+exports.ComplaintModel = mongoose.model("complaints", complaintSchema);
 
-exports.userValid = (_reqBody) => {
+exports.complaintValid = (_reqBody) => {
     let joiSchema = Joi.object({
-        city: Joi.string().min(2).max(50).required(),
-        street: Joi.string().min(2).max(50).required(),
-        numHouse: Joi.string().min(2).max(100).email().required(),
-        numEntry: Joi.string().min(6).max(50).required(),
-        numApartment: Joi.number().required(),
-        phone: Joi.string().min(9).max(10).required(),
-        paymentType: Joi.boolean().min(9).max(10).required(),
+        deacription: Joi.string().min(2).max(1000).required(),
+        image: Joi.string().min(2).max(50000).required(),
+        video: Joi.string().min(2).max(10000).required(),
+        isHandled: Joi.boolean().required(),
     });
     return joiSchema.validate(_reqBody);
-}
-
-exports.genToken = (_userId) => {
-    let token = jwt.sign({ _id: _userId }, "secret", { expiresIn: "60min" });
-    return token;
 }
 

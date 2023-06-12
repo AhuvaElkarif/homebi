@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const { authToken, authAdmin } = require("../middlewares/auth");
-const { UserModel, loginValid, userValid, genToken } = require("../models/userModel");
+const { UserModel, loginValid, userValid, genToken, userEdit } = require("../models/userModel");
 
 router.get("/usersList", authAdmin, async (req, res) => {
     let perPage = Math.min(req.query.perPage, 20) || 10;
@@ -82,14 +82,13 @@ router.post("/login", async (req, res) => {
 
 router.put("/:idEdit", authToken, async (req, res) => {
 
-    let validBody = userValid(req.body);
+    let validBody = userEdit(req.body);
     if (validBody.error) {
         res.status(400).json(validBody.error.details);
     }
 
     try {
         let id = req.params.idEdit;
-        req.body.password = await bcrypt.hash(req.body.password ,10)
         let data;
         if (req.tokenData.role == "admin" || id == req.tokenData._id) {
             data = await UserModel.updateOne({ _id: id }, req.body);

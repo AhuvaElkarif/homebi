@@ -8,11 +8,12 @@ const imagesR = require("./images");
 const messagesR = require("./messages");
 const propertiesR = require("./properties");
 const typeExpensesR = require("./typeExpenses");
-const typeProffesionR = require("./typeProffesion");
+const typeProffesionR = require("./typeProffesions");
 const usersPaymentsR = require("./usersPayments");
 const videosR = require("./videos");
 const workersR = require("./workers");
-const workersPaymentsR = require("./workerPayments");
+const workersPaymentsR = require("./workersPayments");
+const whatsAppMessageR = require("./whatsAppMessages");
 
 exports.routesInit = (app) => {
    app.use("/", indexR);
@@ -24,9 +25,11 @@ exports.routesInit = (app) => {
    app.use("/images", imagesR);
    app.use("/properties", propertiesR);
    app.use("/typeExpenses", typeExpensesR);
-   app.use("/typeProffesion", typeProffesionR);
+   app.use("/typeProffesions", typeProffesionR);
    app.use("/usersPayments", usersPaymentsR);
    app.use("/videos", videosR);
    app.use("/workers", workersR);
+   app.use("/messages", messagesR);
    app.use("/workerPayments", workersPaymentsR);
+   app.use("/whatsAppMessages", whatsAppMessageR);
 }

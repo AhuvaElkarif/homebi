@@ -4,7 +4,7 @@ const { BuildingModel, buildingValid } = require("../models/buildingModel")
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-    let perPage = Math.min(req.query.perPage,20) || 4;
+    let perPage = Math.min(req.query.perPage, 20) || 4;
     let page = req.query.page || 1;
     let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
         let data = await BuildingModel.find({})
             .limit(perPage)
             .skip((page - 1) * perPage)
-            .sort({[sort]:reverse})
+            .sort({ [sort]: reverse })
         res.json(data);
     }
     catch (err) {
@@ -22,17 +22,17 @@ router.get("/", async (req, res) => {
     }
 })
 
-router.get("/buildingByUserId",authToken, async (req, res) => {
-    let perPage = Math.min(req.query.perPage,20) || 4;
+router.get("/buildingByUserId", authToken, async (req, res) => {
+    let perPage = Math.min(req.query.perPage, 20) || 4;
     let page = req.query.page || 1;
     let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
 
     try {
-        let data = await BuildingModel.find({userId:req.tokenData._id})
+        let data = await BuildingModel.find({ userId: req.tokenData._id })
             .limit(perPage)
             .skip((page - 1) * perPage)
-            .sort({[sort]:reverse})
+            .sort({ [sort]: reverse })
         res.json(data);
     }
     catch (err) {
@@ -77,7 +77,10 @@ router.put("/:editId", authToken, async (req, res) => {
     }
     try {
         let editId = req.params.editId;
-        let data = await BuildingModel.updateOne({ _id: editId }, req.body)
+        let data;
+        if (req.tokenData.role == "admin" || id == req.tokenData._id) {
+             data = await BuildingModel.updateOne({ _id: editId, userId: req.tokenData._id }, req.body)
+        }
         res.json(data);
     }
     catch (err) {
@@ -89,7 +92,7 @@ router.put("/:editId", authToken, async (req, res) => {
 router.put("/:changeStatus", authAdmin, async (req, res) => {
     try {
         let id = req.params.id;
-        let data = await BuildingModel.updateOne({ _id: id },req.body)
+        let data = await BuildingModel.updateOne({ _id: id }, req.body)
         res.json(data);
     }
     catch (err) {

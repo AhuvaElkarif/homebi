@@ -22,10 +22,12 @@ exports.userValid = (_reqBody) => {
     let joiSchema = Joi.object({
         firstName: Joi.string().min(2).max(50).required(),
         lastName: Joi.string().min(2).max(50).required(),
-        email: Joi.string().min(2).max(100).email().required(),
+        email: Joi.email().required(),
         password: Joi.string().min(6).max(50).required(),
         numApartment: Joi.number().min(0).required(),
         phone: Joi.string().min(9).max(10).required(),
+        nameCompany: Joi.string().min(2).max(50).required(),
+
     });
     return joiSchema.validate(_reqBody);
 }

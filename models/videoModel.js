@@ -3,24 +3,28 @@ const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 
 const videoSchema = new mongoose.Schema({
-    build_id:String,
-    video:String,
-    date_created: {
+    buildId: String,
+    video: String,
+    dateCreated: {
         type: Date, default: Date.now()
+    },
+    status:{
+        type: Boolean, default: true
     }
+
+
 });
 
-exports.ImageMoel = mongoose.model("images", imagesSchema);
+exports.VideoModel = mongoose.model("videos", videoSchema);
 
-exports.userValid = (_reqBody) => {
+exports.videoValid = (_reqBody) => {
+
     let joiSchema = Joi.object({
-        image: Joi.string().min(2).max(50000).required(),
+        buildId:Joi.string().required(),
+        video: Joi.string().min(2).max(50000).required()
     });
     return joiSchema.validate(_reqBody);
 }
 
-exports.genToken = (_userId) => {
-    let token = jwt.sign({ _id: _userId }, "secret", { expiresIn: "60min" });
-    return token;
-}
+
 

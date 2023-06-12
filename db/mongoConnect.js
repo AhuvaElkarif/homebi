@@ -5,6 +5,6 @@ const {config} = require("../config/secret");
 main().catch(err => console.log(err));
 
 async function main() {
-  await mongoose.connect(`mongodb+srv://${config.userDb}:${config.passDb}@cluster0.dm7bgmk.mongodb.net/`);
-  console.log("toysStore atlas connect");
+  await mongoose.connect(`mongodb+srv://${config.userDb}:${config.passDb}@cluster0.dm7bgmk.mongodb.net/homebi`);
+  console.log("hombei connect");
 }

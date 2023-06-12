@@ -4,9 +4,6 @@ const Joi = require("joi");
 const imageSchema = new mongoose.Schema({
     buildId:String,
     image:String,
-    status: {
-        type: Boolean, default: true
-    },
     date_created: {
         type: Date, default: Date.now()
     }

@@ -23,7 +23,6 @@ exports.buildingValid = (_reqBody) => {
     let joiSchema = Joi.object({
         city: Joi.string().min(2).max(50).required(),
         street: Joi.string().min(2).max(50).required(),
-        numHouse: Joi.string().numeric().positive().max(4).required(),
         numEntry: Joi.string().numeric().positive().max(2).required(),
         zipCode: Joi.string().numeric().positive().max(20).required(),
         numApartment: Joi.string().numeric().positive().max(0).required(),

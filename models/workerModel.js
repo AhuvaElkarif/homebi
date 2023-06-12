@@ -1,34 +1,34 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
-const jwt = require("jsonwebtoken");
 
-const expenseModel = new mongoose.Schema({
+const workerSchema = new mongoose.Schema({
+    bulidId:String,
     phone: String,
-    type_proffesion_id: String,
+    // האם צריך גם לערך הזה לעשות תקינות?
+    typeProffesionId: String,
     name:String,
     email:String,
-    date_created: {
+    dateCreated: {
         type: Date, default: Date.now()
+    },
+    status:{
+        type: Boolean, default: true
     }
 });
 
-exports.UserModel = mongoose.model("expenes", complaintSchema);
+exports.WorkerModel = mongoose.model("workers", workerSchema);
 
-exports.userValid = (_reqBody) => {
+exports.workerValid = (_reqBody) => {
     let joiSchema = Joi.object({
-        city: Joi.string().min(2).max(50).required(),
-        street: Joi.string().min(2).max(50).required(),
-        numHouse: Joi.string().min(2).max(100).email().required(),
-        numEntry: Joi.string().min(6).max(50).required(),
-        numApartment: Joi.number().required(),
+        name: Joi.string().min(2).max(50).required(),
         phone: Joi.string().min(9).max(10).required(),
-        paymentType: Joi.boolean().min(9).max(10).required(),
+        email: Joi.email().required(),
+        typeProffesionId:Joi.string().required(),
+        bulidId:Joi.string().required()
+
+
     });
     return joiSchema.validate(_reqBody);
 }
 
-exports.genToken = (_userId) => {
-    let token = jwt.sign({ _id: _userId }, "secret", { expiresIn: "60min" });
-    return token;
-}
 

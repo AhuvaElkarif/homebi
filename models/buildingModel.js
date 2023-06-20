@@ -2,16 +2,21 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 //do regex
 const buildingSchema = new mongoose.Schema({
-    city: String,
-    street: String,
-    numHouse: String,
-    numEntry: String,
-    zipCode: String,
-    numApartments: String,
-    paymentType: Boolean,
-    paymentFees: Number,
-    userId:String,
-    isCompany:Boolean,
+    entry: { type: Number, default: 1 },
+    city: { type: String, default: "" },
+    Street: { type: String, default: "" },
+    zipCode: { type: String, default: "" },
+    num: { type: Number, default: 1 },
+    numApartments: { type: String, default: "" },
+    paymentType: { type: Boolean, default: "" },
+    paymentFees: { type: Number, default: "" },
+    isCompany: { type: Boolean, default: "" },
+    image: [{ type: String, default: "" }],
+    video: [{ type: String, default: "" }],
+    users: [mongoose.ObjectId],
+    messages: [mongoose.ObjectId],
+    complaints: [mongoose.ObjectId],
+    workers: [mongoose.ObjectId],
     date_created: {
         type: Date, default: Date.now()
     }
@@ -21,10 +26,11 @@ exports.BuildingModel = mongoose.model("buildings", buildingSchema);
 
 exports.buildingValid = (_reqBody) => {
     let joiSchema = Joi.object({
-        city: Joi.string().min(2).max(50).required(),
-        street: Joi.string().min(2).max(50).required(),
-        numEntry: Joi.string().numeric().positive().max(2).required(),
-        zipCode: Joi.string().numeric().positive().max(20).required(),
+        entry: Joi.number().min(1).max(99),
+        city: Joi.string().min(2).max(99),
+        Street: Joi.string().min(2).max(99),
+        zipCode: Joi.string().min(2).max(99),
+        num: Joi.number().min(1).max(500),
         numApartment: Joi.string().numeric().positive().max(0).required(),
         paymentType: Joi.boolean().required(),
         paymentFees: Joi.number().positive().required(),

@@ -22,6 +22,24 @@ router.get("/usersList", authAdmin, async (req, res) => {
     }
 })
 
+router.get("/usersByBuilding", authAdmin, async (req, res) => {
+    let perPage = Math.min(req.query.perPage, 20) || 10;
+    let page = req.query.page || 1;
+    let sort = req.query.sort || "_id";
+    let reverse = req.query.reverse == "yes" ? -1 : 1;
+    try {
+        let data = await UserModel
+            .find({buildId:req.params.id})
+            .limit(perPage)
+            .sort({ [sort]: reverse })
+            .skip((page - 1) * perPage);
+        res.status(200).json(data);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ err: "error", err });
+    }
+})
+
 router.get("/myInfo", authToken, async (req, res) => {
     try {
         let user = await UserModel.findOne({ _id: req.tokenData._id }, { password: 0 });

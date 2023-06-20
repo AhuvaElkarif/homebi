@@ -11,6 +11,7 @@ router.get("/", async (req, res) => {
 
     try {
         let data = await ComplaintModel.find({})
+            .populate({ path: 'userId', model: 'users' })
             .limit(perPage)
             .skip((page - 1) * perPage)
             .sort({ [sort]: reverse })
@@ -32,7 +33,7 @@ router.get("/:id", authToken, async (req, res) => {
         let data = await ComplaintModel.find({ buildId: req.params.id })
             .limit(perPage)
             .skip((page - 1) * perPage)
-            .sort({ [sort]: reverse })
+            .sort({ [sort]: reverse });
         res.json(data);
     }
     catch (err) {
@@ -86,6 +87,19 @@ router.put("/:editId", authToken, async (req, res) => {
     }
 })
 
+router.put("/changeHandled/:editId", authToken, async (req, res) => {
+    try {
+        let editId = req.params.editId;
+        let data = await ComplaintModel.updateOne({ _id: editId }
+            , [{ "$set": { "isHandled": { "$eq": [false, "$isHandled"] } } }]);
+        res.json(data);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: "there error try again later", err })
+    }
+})
+
 router.put("/:changeStatus", authAdmin, async (req, res) => {
     try {
         let id = req.params.id;
@@ -103,14 +117,14 @@ router.put("/:changeStatus", authAdmin, async (req, res) => {
     }
 })
 
-router.delete("/:delId", authAdmin, async (req, res) => {
+router.delete("/:id", authToken, async (req, res) => {
     try {
-        let delId = req.params.delId;
+        let id = req.params.id;
         let data;
         if (req.tokenData.role == "admin") {
-            data = await CakeModel.deleteOne({ _id: delId });
+            data = await ComplaintModel.deleteOne({ _id: id });
         } else {
-            data = await CakeModel.deleteOne({ _id: delId, user_id: req.tokenData._id });
+            data = await ComplaintModel.deleteOne({ _id: id, userId: req.tokenData._id });
         }
         res.json(data);
     }

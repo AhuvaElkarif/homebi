@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 
 const aboutSchema = new mongoose.Schema({
-    header:String,
-    context:String,
+    header: { type: String, default: "" },
+    context: { type: String, default: "" },
     date_created: {
         type: Date, default: Date.now()
     }

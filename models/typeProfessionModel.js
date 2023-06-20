@@ -2,13 +2,9 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 
 const typeProfessionSchema = new mongoose.Schema({
-    typeProfession: String,
-    dateCreated: {
-        type: Date, default: Date.now()
-    },
-    status:{
-        type: Boolean, default: true
-    }
+    typeProfession: { type: String, default: "" },
+    dateCreated: { type: Date, default: Date.now() },
+    status: { type: Boolean, default: true }
 });
 
 exports.TypeProfessionModel = mongoose.model("typeProfessions", typeProfessionSchema);

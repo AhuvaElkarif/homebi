@@ -43,7 +43,10 @@ router.get("/buildingByUserId", authToken, async (req, res) => {
 
 router.get("/single/:id", async (req, res) => {
     try {
-        let data = await BuildingModel.findOne({ _id: req.params.id });
+        // path - מכוון אחרי המקודותיים לאיזה מאפיין אתה רצה לקחת מהמודל
+        // model -  לפי הקולקשיין הזה תביא לי אובייקטים ממונגו
+        let data = await BuildingModel.findOne({ _id: req.params.id })
+            .populate({ path: 'users', model: 'users' });
         res.json(data);
     }
     catch (err) {
@@ -79,7 +82,7 @@ router.put("/:editId", authToken, async (req, res) => {
         let editId = req.params.editId;
         let data;
         if (req.tokenData.role == "admin" || id == req.tokenData._id) {
-             data = await BuildingModel.updateOne({ _id: editId, userId: req.tokenData._id }, req.body)
+            data = await BuildingModel.updateOne({ _id: editId, userId: req.tokenData._id }, req.body)
         }
         res.json(data);
     }

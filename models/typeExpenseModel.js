@@ -2,9 +2,8 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 
 const typeExpenseSchema = new mongoose.Schema({
-    type: String,//חשמל
+    type:  {type: String, default:""},//חשמל
     propertiesList:Array,
-    
     status:{
         type: Boolean, default: true
     }

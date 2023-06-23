@@ -2,24 +2,19 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 
 const usersPaymentSchema = new mongoose.Schema({
-    userId: String,
-    price:Number,
-    isPay:Boolean,
-    datCreated: {
-        type: Date, default: Date.now()
-    },
-    status:{
-        type: Boolean, default: true
-    }
+    price: { type: Number, default: 0 },
+    isPay: { type: Boolean, default: false },
+    dateCreated: { type: Date, default: Date.now() },
+    userId: {type:mongoose.ObjectId, default:null},
+    status: { type: Boolean, default: true }
 });
 
 exports.UsersPaymentModel = mongoose.model("usersPayments", usersPaymentSchema);
 
 exports.usersPaymentrValid = (_reqBody) => {
     let joiSchema = Joi.object({
-        userId:Joi.string.required(),
         price: Joi.number().min(2).max(5000).required(),
-        isPay: Joi.boolean().min(9).max(10).required(),
+        isPay: Joi.boolean().required(),
     });
     return joiSchema.validate(_reqBody);
 }

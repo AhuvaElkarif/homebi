@@ -3,6 +3,12 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const { authToken, authAdmin } = require("../middlewares/auth");
 const { UserModel, loginValid, userValid, genToken, userEdit } = require("../models/userModel");
+const { BuildingModel } = require("../models/buildingModel");
+
+// ראוט שבודק שהטוקן תקין ומחזיר מידע עליו כגון איי די של המשתמש פלוס התפקיד שלו
+router.get("/checkToken", authToken, async (req, res) => {
+    res.json(req.tokenData);
+})
 
 router.get("/usersList", authAdmin, async (req, res) => {
     let perPage = Math.min(req.query.perPage, 20) || 10;
@@ -29,7 +35,7 @@ router.get("/usersByBuilding", authAdmin, async (req, res) => {
     let reverse = req.query.reverse == "yes" ? -1 : 1;
     try {
         let data = await UserModel
-            .find({buildId:req.params.id})
+            .find({ buildId: req.params.id })
             .limit(perPage)
             .sort({ [sort]: reverse })
             .skip((page - 1) * perPage);
@@ -42,7 +48,16 @@ router.get("/usersByBuilding", authAdmin, async (req, res) => {
 
 router.get("/myInfo", authToken, async (req, res) => {
     try {
-        let user = await UserModel.findOne({ _id: req.tokenData._id }, { password: 0 });
+        let user = await UserModel.findOne({ _id: req.tokenData._id }, { password: 0 })
+        .populate({
+            path: 'buildId',
+            populate: {
+              path: 'users', populate: {path:'usersPayments',model:'usersPayments'},
+               model: 'users'
+            },
+            model: 'buildings'
+          })    
+        // .populate({ path: 'buildId', model: 'buildings' });
         res.json({ user });
     } catch (err) {
         console.log(err);
@@ -51,7 +66,7 @@ router.get("/myInfo", authToken, async (req, res) => {
 })
 
 router.post("/", async (req, res) => {
-
+    const { buildId } = req.query;
     let validBody = userValid(req.body);
     if (validBody.error) {
         return res.status(400).json(validBody.error.details);
@@ -60,7 +75,10 @@ router.post("/", async (req, res) => {
     try {
         let user = new UserModel(req.body);
         user.password = await bcrypt.hash(user.password, 10);
+        user.buildId = buildId;
         await user.save();
+        let rest = await BuildingModel.updateOne({ _id: buildId }, { $push: { 'users': user._id } })
+        console.log(rest);
         user.password = "******";
         res.status(201).json(user);
     } catch (err) {
@@ -126,7 +144,10 @@ router.put("/:idEdit", authToken, async (req, res) => {
 router.delete("/:idDel", authAdmin, async (req, res) => {
     try {
         let id = req.params.idDel;
+        let buildId = req.params.buildId;
         let data;
+        let rest = await BuildingModel.updateOne({ _id: buildId },
+            { $pull: { 'users': { $in: [id] } } })
         if (req.tokenData.role === "admin") {
             data = await UserModel.deleteOne({ _id: id });
         }

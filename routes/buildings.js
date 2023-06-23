@@ -46,8 +46,20 @@ router.get("/single/:id", async (req, res) => {
         // path - מכוון אחרי המקודותיים לאיזה מאפיין אתה רצה לקחת מהמודל
         // model -  לפי הקולקשיין הזה תביא לי אובייקטים ממונגו
         let data = await BuildingModel.findOne({ _id: req.params.id })
-            .populate({ path: 'users', model: 'users' });
-        res.json(data);
+        .populate({
+            path: 'users',
+            populate: {
+              path: 'usersPayments',
+               model: 'usersPayments'
+            },
+            model: 'users'
+          })
+            // .populate({ path: 'users', model: 'users' })
+            .populate({ path: 'messages', model: 'messages' })
+            .populate({ path: 'complaints', model: 'complaints' })
+            // .populate({ path: 'usersPayments', model: 'usersPayments' });
+        
+            res.json(data);
     }
     catch (err) {
         console.log(err);
@@ -55,14 +67,14 @@ router.get("/single/:id", async (req, res) => {
     }
 })
 
-router.post("/", authToken, async (req, res) => {
+router.post("/", async (req, res) => {
     let validBody = buildingValid(req.body);
     if (validBody.error) {
         return res.status(400).json(validBody.error.details);
     }
     try {
         let building = new BuildingModel(req.body);
-        building.userId = req.tokenData._id;
+        // building.userId = req.tokenData._id;
         await building.save();
         res.status(201).json(building);
     }

@@ -17,7 +17,8 @@ const buildingSchema = new mongoose.Schema({
     messages: [mongoose.ObjectId],
     complaints: [mongoose.ObjectId],
     workers: [mongoose.ObjectId],
-    date_created: {
+    usersPayments: [mongoose.ObjectId],
+    dateCreated: {
         type: Date, default: Date.now()
     }
 });
@@ -31,7 +32,7 @@ exports.buildingValid = (_reqBody) => {
         Street: Joi.string().min(2).max(99),
         zipCode: Joi.string().min(2).max(99),
         num: Joi.number().min(1).max(500),
-        numApartment: Joi.string().numeric().positive().max(0).required(),
+        numApartment: Joi.string().regex(/^[1-9]\d*$/).required(),
         paymentType: Joi.boolean().required(),
         paymentFees: Joi.number().positive().required(),
         isCompany: Joi.boolean().required(),

@@ -15,6 +15,8 @@ const userSchema = new mongoose.Schema({
     status: { type: Boolean, default: false },
     nameCompany: { type: String, default: "" },
     role: { type: String, default: "user" },
+    usersPayments: [mongoose.ObjectId],
+    buildId: { type: mongoose.ObjectId, default: null },
     date_created: { type: Date, default: Date.now() }
 });
 
@@ -24,14 +26,12 @@ exports.userValid = (_reqBody) => {
     let joiSchema = Joi.object({
         fullName: {
             firstName: Joi.string().min(2).max(50).required(),
-            lastName: Joi.string().min(2).max(50).required()
+            lastName: Joi.string().min(2).max(50).required(),
         },
-        email: Joi.email().required(),
+        email: Joi.string().email().required(),
         password: Joi.string().min(6).max(50).required(),
         numApartment: Joi.number().min(0).required(),
         phone: Joi.string().min(9).max(10).required(),
-        nameCompany: Joi.string().min(2).max(50).required(),
-
     });
     return joiSchema.validate(_reqBody);
 }

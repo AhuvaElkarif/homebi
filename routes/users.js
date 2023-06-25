@@ -52,8 +52,9 @@ router.get("/myInfo", authToken, async (req, res) => {
         .populate({
             path: 'buildId',
             populate: {
-              path: 'users', populate: {path:'usersPayments',model:'usersPayments'},
-               model: 'users'
+              path: 'users'
+              , populate: {path:'usersPayments',model:'usersPayments'},
+               model: 'users',
             },
             model: 'buildings'
           })    
@@ -141,7 +142,7 @@ router.put("/:idEdit", authToken, async (req, res) => {
     }
 })
 
-router.delete("/:idDel", authAdmin, async (req, res) => {
+router.delete("/:idDel/:buildId", authAdmin, async (req, res) => {
     try {
         let id = req.params.idDel;
         let buildId = req.params.buildId;

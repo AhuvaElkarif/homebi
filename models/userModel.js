@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
     status: { type: Boolean, default: false },
     nameCompany: { type: String, default: "" },
     role: { type: String, default: "user" },
+    price: { type: Number, default: 0 },
     usersPayments: [mongoose.ObjectId],
     buildId: { type: mongoose.ObjectId, default: null },
     date_created: { type: Date, default: Date.now() }

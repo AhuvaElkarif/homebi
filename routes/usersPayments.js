@@ -27,11 +27,17 @@ router.get("/", async (req, res) => {
 
 })
 
-router.get("/:min/:max", authToken, async (req, res) => {
-  const {min, max} = req.params;
+router.get("/:month/:year", authToken, async (req, res) => {
+  let { month, year } = req.params;
+
   try {
     let data = await UsersPaymentModel
-      .find({ $and: [{ dateCreated: { $gte: min } }, { dateCreated: { $lte: max } }] })
+    .find({  $expr: {
+      $and: [
+        { $eq: [{ $month: '$dateCreated' }, month] },
+        { $eq: [{ $year: '$dateCreated' }, year] }
+      ]
+    }})
       .populate({ path: 'userId', model: 'users' });
     res.json(data);
   }
@@ -124,7 +130,20 @@ router.put("/:editId", authAdmin, async (req, res) => {
 router.put("/:changeStatus", authAdmin, async (req, res) => {
   try {
     let id = req.params.id;
-    let data = await BuildingModel.updateOne({ _id: id }, req.body)
+    let data = await UsersPaymentModel.updateOne({ _id: id }, req.body)
+    res.json(data);
+  }
+  catch (err) {
+    console.log(err);
+    res.status(500).json({ msg: "there error try again later", err })
+  }
+})
+
+router.patch("/changePay/:id", authAdmin, async (req, res) => {
+  try {
+    let id = req.params.id;
+    let data = await UsersPaymentModel.updateOne({ _id: id }
+      ,[{ "$set": { "isPay": { "$eq": [false, "$isPay"] } } }]);
     res.json(data);
   }
   catch (err) {

@@ -15,6 +15,7 @@ exports.usersPaymentrValid = (_reqBody) => {
     let joiSchema = Joi.object({
         price: Joi.number().min(2).max(5000).required(),
         isPay: Joi.boolean().required(),
+        dateCreated: Joi.date().allow(null, ''),
     });
     return joiSchema.validate(_reqBody);
 }

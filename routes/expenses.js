@@ -1,6 +1,7 @@
 const express = require("express");
 const { authAdmin } = require("../middlewares/auth");
-const { ExpenseModel, expenseValid } = require("../models/expenseModel")
+const { ExpenseModel, expenseValid } = require("../models/expenseModel");
+const { BuildingModel } = require("../models/buildingModel");
 const router = express.Router();
 
 router.get("/", authAdmin, async (req, res) => {
@@ -52,13 +53,17 @@ router.get("/single/:id", async (req, res) => {
     }
 })
 
-router.post("/",authAdmin, async (req, res) => {
+router.post("/:buildId",authAdmin, async (req, res) => {
     let validBody = expenseValid(req.body);
     if (validBody.error) {
         return res.status(400).json(validBody.error.details);
     }
     try {
-        let expense = new ExpenseModel(req.body); await expense.save();
+        const {buildId} = req.params;
+        let expense = new ExpenseModel(req.body);
+        let rest = await BuildingModel.updateOne({ _id: buildId },
+            { $pull: { 'expenses': { $in: [expense._id] } } })
+         await expense.save();
         res.status(201).json(expense);
     }
     catch (err) {

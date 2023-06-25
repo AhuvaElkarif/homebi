@@ -57,7 +57,7 @@ router.get("/single/:id", async (req, res) => {
             // .populate({ path: 'users', model: 'users' })
             .populate({ path: 'messages', model: 'messages' })
             .populate({ path: 'complaints', model: 'complaints' })
-            // .populate({ path: 'usersPayments', model: 'usersPayments' });
+            .populate({ path: 'expenses', model: 'expenses' });
         
             res.json(data);
     }

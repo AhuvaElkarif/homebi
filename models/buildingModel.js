@@ -1,44 +1,44 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
-//do regex
+
 const buildingSchema = new mongoose.Schema({
-    entry: { type: Number, default: 1 },
+    numEntry: { type: Number, default: 1 },
     city: { type: String, default: "" },
-    Street: { type: String, default: "" },
+    street: { type: String, default: "" },
     zipCode: { type: String, default: "" },
     num: { type: Number, default: 1 },
-    numApartments: { type: String, default: "" },
+    lat: { type: Number, default: 0 },
+    lng: { type: Number, default: 0 },
+    numApartments: { type: Number, default: 0 },
     description: { type: String, default: "" },
     paymentType: { type: Boolean, default: "" },
     paymentFees: { type: Number, default: "" },
-    isCompany: { type: Boolean, default: "" },
-    image: [{ type: String, default: "" }],
-    video: [{ type: String, default: "" }],
+    userId: {type:mongoose.ObjectId, default:null},
+    images: [{ type: String, default: "" }],
     users: [mongoose.ObjectId],
     expenses: [mongoose.ObjectId],
     messages: [mongoose.ObjectId],
     complaints: [mongoose.ObjectId],
-    workers: [mongoose.ObjectId],
     usersPayments: [mongoose.ObjectId],
-    dateCreated: {
-        type: Date, default: Date.now()
-    }
+    dateCreated: { type: Date, default: Date.now() }
 });
 
 exports.BuildingModel = mongoose.model("buildings", buildingSchema);
 
 exports.buildingValid = (_reqBody) => {
     let joiSchema = Joi.object({
-        entry: Joi.number().min(1).max(99),
+        lat: Joi.number().required(),
+        lng: Joi.number().required(),
+        numEntry: Joi.number().min(1).max(99),
         city: Joi.string().min(2).max(99),
-        Street: Joi.string().min(2).max(99),
+        street: Joi.string().min(2).max(99),
         zipCode: Joi.string().min(2).max(99),
         num: Joi.number().min(1).max(500),
-        numApartment: Joi.string().regex(/^[1-9]\d*$/).required(),
+        numApartments: Joi.number().required(),
         description: Joi.string().required(),
         paymentType: Joi.boolean().required(),
         paymentFees: Joi.number().positive().required(),
-        isCompany: Joi.boolean().required(),
+        images: Joi.array().allow(null, ''),
     });
     return joiSchema.validate(_reqBody);
 }

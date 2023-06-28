@@ -12,11 +12,12 @@ const userSchema = new mongoose.Schema({
     password: { type: String, default: "" },
     phone: { type: String, default: "" },
     numApartment: { type: Number, default: 0 },
-    status: { type: Boolean, default: false },
-    nameCompany: { type: String, default: "" },
+    status: { type: Boolean, default: true },
     role: { type: String, default: "user" },
+    area: { type: Number, default: 0 },
     price: { type: Number, default: 0 },
     usersPayments: [mongoose.ObjectId],
+    active: { type: Boolean, default: true },
     buildId: { type: mongoose.ObjectId, default: null },
     date_created: { type: Date, default: Date.now() }
 });
@@ -30,9 +31,12 @@ exports.userValid = (_reqBody) => {
             lastName: Joi.string().min(2).max(50).required(),
         },
         email: Joi.string().email().required(),
-        password: Joi.string().min(6).max(50).required(),
+        password: Joi.string().regex(/^(?=.*[A-Za-z])(?=.*\d).{6,}$/).required(),
         numApartment: Joi.number().min(0).required(),
+        area: Joi.number().min(10).allow(null),
         phone: Joi.string().min(9).max(10).required(),
+        price: Joi.number().min(0).required(),
+        active: Joi.boolean().allow(null),
     });
     return joiSchema.validate(_reqBody);
 }
@@ -45,7 +49,16 @@ exports.genToken = (_userId, _role) => {
 exports.loginValid = (_reqBody) => {
     let joiSchema = Joi.object({
         email: Joi.string().min(2).max(100).email().required(),
-        password: Joi.string().min(6).max(50).required()
+        password: Joi.string().regex(/^(?=.*[A-Za-z])(?=.*\d).{6,}$/).required()
+    });
+    return joiSchema.validate(_reqBody);
+}
+
+exports.registerValid = (_reqBody) => {
+    let joiSchema = Joi.object({
+        email: Joi.string().email().required(),
+        numApartment: Joi.number().min(0).required(),
+        buildId: Joi.string().required(),
     });
     return joiSchema.validate(_reqBody);
 }

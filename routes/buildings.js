@@ -1,6 +1,7 @@
 const express = require("express");
 const { authAdmin, authToken } = require("../middlewares/auth");
-const { BuildingModel, buildingValid } = require("../models/buildingModel")
+const { BuildingModel, buildingValid } = require("../models/buildingModel");
+const { UserModel } = require("../models/userModel");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -46,20 +47,20 @@ router.get("/single/:id", async (req, res) => {
         // path - מכוון אחרי המקודותיים לאיזה מאפיין אתה רצה לקחת מהמודל
         // model -  לפי הקולקשיין הזה תביא לי אובייקטים ממונגו
         let data = await BuildingModel.findOne({ _id: req.params.id })
-        .populate({
-            path: 'users',
-            populate: {
-              path: 'usersPayments',
-               model: 'usersPayments'
-            },
-            model: 'users'
-          })
+            .populate({
+                path: 'users',
+                populate: {
+                    path: 'usersPayments',
+                    model: 'usersPayments'
+                },
+                model: 'users'
+            })
             // .populate({ path: 'users', model: 'users' })
             .populate({ path: 'messages', model: 'messages' })
             .populate({ path: 'complaints', model: 'complaints' })
             .populate({ path: 'expenses', model: 'expenses' });
-        
-            res.json(data);
+
+        res.json(data);
     }
     catch (err) {
         console.log(err);
@@ -68,14 +69,22 @@ router.get("/single/:id", async (req, res) => {
 })
 
 router.post("/", async (req, res) => {
-    let validBody = buildingValid(req.body);
+    let validBody = buildingValid(req.body.building);
     if (validBody.error) {
         return res.status(400).json(validBody.error.details);
     }
     try {
-        let building = new BuildingModel(req.body);
-        // building.userId = req.tokenData._id;
+        let building = new BuildingModel(req.body.building);
+        let userAdmin = req.body.manager;
+        userAdmin.buildId = building._id;
+        let user = new UserModel(userAdmin);
+        user.role = "admin";
+        console.log(user)
+        await user.save();
+        building.userId = user._id;
         await building.save();
+
+        let rest = await BuildingModel.updateOne({ _id: building._id }, { $push: { 'users': user._id } })
         res.status(201).json(building);
     }
     catch (err) {

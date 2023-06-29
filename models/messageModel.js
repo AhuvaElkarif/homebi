@@ -12,7 +12,7 @@ exports.MessageModel = mongoose.model("messages", messageSchema);
 exports.messageValid = (_reqBody) => {
     let joiSchema = Joi.object({
         description: Joi.string().min(2).max(50000).required(),
-        buildId: { type: mongoose.ObjectId, default: null },
+        buildId: Joi.string().required(),
     });
     return joiSchema.validate(_reqBody);
 }

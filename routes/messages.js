@@ -103,7 +103,7 @@ router.delete("/:delId", authAdmin, async (req, res) => {
     try {
         let delId = req.params.delId;
         let data;
-        data = await CakeModel.deleteOne({ _id: delId });
+        data = await MessageModel.deleteOne({ _id: delId });
         res.json(data);
     }
     catch (err) {

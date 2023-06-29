@@ -1,6 +1,7 @@
 const express = require("express");
 const { authAdmin } = require("../middlewares/auth");
 const { messageValid, MessageModel } = require("../models/messageModel");
+const { ExpenseModel } = require("../models/expenseModel");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -103,6 +104,26 @@ router.delete("/:delId", authAdmin, async (req, res) => {
         let delId = req.params.delId;
         let data;
         data = await CakeModel.deleteOne({ _id: delId });
+        res.json(data);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: "there error try again later", err })
+    }
+})
+
+router.get("/byYear/:year/:buildId", authAdmin, async (req, res) => {
+    const { buildId, year } = req.params;
+    console.log(buildId)
+    try {
+        let data = await ExpenseModel.find({
+            buildId: buildId,
+            date_created: {
+                $gte: new Date(`${year}-01-01`),
+                $lt: new Date(`${year + 1}-01-01`),
+            },
+        })
+
         res.json(data);
     }
     catch (err) {

@@ -2,7 +2,10 @@ const express = require("express");
 const { authToken, authAdmin } = require("../auth/authToken");
 const { UsersPaymentModel, usersPaymentrValid } = require("../models/usersPaymentModel");
 const { UserModel } = require("../models/userModel");
+const { BuildingModel } = require("../models/buildingModel");
 const router = express.Router();
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Types;
 
 
 router.get("/", async (req, res) => {
@@ -25,6 +28,85 @@ router.get("/", async (req, res) => {
     res.status(500).json({ msg: "err", err })
   }
 
+})
+const getPaymentsForYearInBuilding = async (buildingId, year) => {
+  try {
+    const building = await BuildingModel.findById(buildingId);
+
+    const filteredUserPayments = building.users.reduce((acc, user) => {
+      const userPaymentsForYear = user.usersPayments ?? [] // Nullish coalescing operator
+
+      const filteredPayments = userPaymentsForYear.filter(payment => {
+        const paymentYear = payment.dateCreated.getFullYear();
+        return paymentYear === year;
+      });
+
+      return [...acc, ...filteredPayments];
+    }, []);
+
+    console.log(filteredUserPayments);
+    // Do something with the filteredUserPayments
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
+// const getPaymentsForYearInBuilding = async (buildingId, year) => {
+//   try {
+//     console.log
+//     const pipeline = [
+//       {
+//         $match: {
+//           _id: new ObjectId(buildingId),
+//           'usersPayments.dateCreated': {
+//             $gte: new Date(`${year}-01-01`),
+//             $lt: new Date(`${Number(year) + 1}-01-01`),
+//           },
+//         },
+//       },
+//       {
+//         $project: {
+//           usersPayments: {
+//             $filter: {
+//               input: '$usersPayments',
+//               as: 'payment',
+//               cond: {
+//                 $and: [
+//                   { $gte: ['$$payment.dateCreated', new Date(`${year}-01-01`)] },
+//                   { $lt: ['$$payment.dateCreated', new Date(`${Number(year) + 1}-01-01`)] },
+//                 ],
+//               },
+//             },
+//           },
+//         },
+//       },
+//     ];
+
+//     const building = await BuildingModel.aggregate(pipeline);
+
+//     console.log(building);
+//     // Do something with the building and its filtered userPayments
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
+
+
+
+// Usage
+
+router.get("/byYear/:year/:buildId", authAdmin, async (req, res) => {
+  const { buildId, year } = req.params;
+  
+try {
+  getPaymentsForYearInBuilding(buildId, year);
+
+  }
+  catch (err) {
+      console.log(err);
+      res.status(500).json({ msg: "there error try again later", err })
+  }
 })
 
 router.get("/:month/:year", authToken, async (req, res) => {

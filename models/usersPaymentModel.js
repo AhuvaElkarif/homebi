@@ -13,7 +13,7 @@ exports.UsersPaymentModel = mongoose.model("usersPayments", usersPaymentSchema);
 
 exports.usersPaymentrValid = (_reqBody) => {
     let joiSchema = Joi.object({
-        price: Joi.number().min(2).max(5000).required(),
+        price: Joi.number().max(5000).required(),
         isPay: Joi.boolean().required(),
         dateCreated: Joi.date().allow(null, ''),
     });

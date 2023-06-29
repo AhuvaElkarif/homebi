@@ -1,6 +1,7 @@
 const express = require("express");
 const { authAdmin, authToken } = require("../middlewares/auth");
-const { ComplaintModel, complaintValid } = require("../models/complaintModel")
+const { ComplaintModel, complaintValid } = require("../models/complaintModel");
+const { ExpenseModel } = require("../models/expenseModel");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -22,6 +23,7 @@ router.get("/", async (req, res) => {
         res.status(500).json({ msg: "there error try again later", err })
     }
 })
+
 
 router.get("/:id", authToken, async (req, res) => {
     let perPage = Math.min(req.query.perPage, 20) || 4;

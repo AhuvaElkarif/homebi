@@ -24,12 +24,13 @@ router.get("/", authAdmin, async (req, res) => {
     }
 })
 
+
+
 router.get("/graph", async (req, res) => {
     const currentYear = new Date().getFullYear();
 
     // Generate an array of month numbers from 1 to 12
     const months = Array.from({ length: 12 }, (_, index) => index + 1);
-    let s1;
     ExpenseModel.aggregate([
         {
             $match: {
@@ -62,63 +63,63 @@ router.get("/graph", async (req, res) => {
 
 
 
-  
+
 
 })
 router.get("/payments", async (req, res) => {
-      // Create an array of all months in the year
+    // Create an array of all months in the year
     const currentYear = new Date().getFullYear();
 
-      const allMonths = Array.from({ length: 12 }, (_, index) => index + 1);
-      UsersPaymentModel
-          .aggregate([
-              {
-                  $match: {
-                      dateCreated: {
-                          $gte: new Date(`${currentYear}-01-01`),
-                          $lt: new Date(`${currentYear + 1}-01-01`),
-                      },
-                  },
-              },
-              {
-                  $group: {
-                      _id: { $month: "$dateCreated" },
-                      totalPayments: { $sum: "$price" },
-                  },
-              },
-              {
-                  $sort: {
-                      _id: 1, // Sort by month in ascending order
-                  },
-              },
-          ])
-          .exec()
-          .then((result) => {
-              // Create a map to store the monthly payments
-              const monthlyPaymentsMap = new Map();
-  
-              // Initialize the map with all months and set their values to 0
-              allMonths.forEach((month) => {
-                  monthlyPaymentsMap.set(month, 0);
-              });
-  
-              // Update the map with the actual payments
-              result.forEach((item) => {
-                  monthlyPaymentsMap.set(item._id, item.totalPayments);
-              });
-  
-              // Convert the map to an array of objects
-              const monthlyPayments = Array.from(monthlyPaymentsMap, ([month, totalPayments]) => (totalPayments));
-  
-              console.log(monthlyPayments);
-              res.json(monthlyPayments);
-              // Process the monthlyPayments array
-          })
-          .catch((error) => {
-              console.error(error);
-              // Handle the error
-          });
-  
+    const allMonths = Array.from({ length: 12 }, (_, index) => index + 1);
+    UsersPaymentModel
+        .aggregate([
+            {
+                $match: {
+                    dateCreated: {
+                        $gte: new Date(`${currentYear}-01-01`),
+                        $lt: new Date(`${currentYear + 1}-01-01`),
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: { $month: "$dateCreated" },
+                    totalPayments: { $sum: "$price" },
+                },
+            },
+            {
+                $sort: {
+                    _id: 1, // Sort by month in ascending order
+                },
+            },
+        ])
+        .exec()
+        .then((result) => {
+            // Create a map to store the monthly payments
+            const monthlyPaymentsMap = new Map();
+
+            // Initialize the map with all months and set their values to 0
+            allMonths.forEach((month) => {
+                monthlyPaymentsMap.set(month, 0);
+            });
+
+            // Update the map with the actual payments
+            result.forEach((item) => {
+                monthlyPaymentsMap.set(item._id, item.totalPayments);
+            });
+
+            // Convert the map to an array of objects
+            const monthlyPayments = Array.from(monthlyPaymentsMap, ([month, totalPayments]) => (totalPayments));
+
+            console.log(monthlyPayments);
+            res.json(monthlyPayments);
+            // Process the monthlyPayments array
+        })
+        .catch((error) => {
+            console.error(error);
+            // Handle the error
+        });
+
 })
 router.get("/pie", async (req, res) => {
     try {
@@ -221,7 +222,7 @@ router.post("/:buildId", authAdmin, async (req, res) => {
     try {
         const { buildId } = req.params;
         console.log(req.body)
-console.log(buildId)
+        console.log(buildId)
         let expense = new ExpenseModel(req.body);
         let rest = await BuildingModel.updateOne({ _id: buildId },
             { $pull: { 'expenses': { $in: [expense._id] } } })
@@ -304,7 +305,7 @@ router.get("/:month/:year", authToken, async (req, res) => {
                     ]
                 }
             })
-            // .populate({ path: 'userId', model: 'users' });
+        // .populate({ path: 'userId', model: 'users' });
         res.json(data);
     }
     catch (err) {
@@ -313,5 +314,6 @@ router.get("/:month/:year", authToken, async (req, res) => {
     }
 
 })
+
 
 module.exports = router;

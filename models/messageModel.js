@@ -3,7 +3,7 @@ const Joi = require("joi");
 
 const messageSchema = new mongoose.Schema({
     description: { type: String, default: "" },
-    status: { type: Boolean, default: true },
+    buildId: { type: mongoose.ObjectId, default: null },
     date_created: { type: Date, default: Date.now() }
 });
 
@@ -12,7 +12,7 @@ exports.MessageModel = mongoose.model("messages", messageSchema);
 exports.messageValid = (_reqBody) => {
     let joiSchema = Joi.object({
         description: Joi.string().min(2).max(50000).required(),
-        status: Joi.boolean.required(),
+        buildId: { type: mongoose.ObjectId, default: null },
     });
     return joiSchema.validate(_reqBody);
 }

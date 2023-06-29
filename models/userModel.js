@@ -31,7 +31,7 @@ exports.userValid = (_reqBody) => {
             lastName: Joi.string().min(2).max(50).required(),
         },
         email: Joi.string().email().required(),
-        password: Joi.string().regex(/^(?=.*[A-Za-z])(?=.*\d).{6,}$/).required(),
+        password: Joi.string().regex(/^(?=.*[A-Za-z])(?=.*\d).{6,}$/).allow(null),
         numApartment: Joi.number().min(0).required(),
         area: Joi.number().min(10).allow(null),
         phone: Joi.string().min(9).max(10).required(),

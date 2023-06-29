@@ -1,5 +1,5 @@
 const express = require("express");
-const { authAdmin } = require("../middlewares/auth");
+const { authAdmin, authToken } = require("../middlewares/auth");
 const { ExpenseModel, expenseValid } = require("../models/expenseModel");
 const { BuildingModel } = require("../models/buildingModel");
 const { UsersPaymentModel } = require("../models/usersPaymentModel");
@@ -220,6 +220,8 @@ router.post("/:buildId", authAdmin, async (req, res) => {
     }
     try {
         const { buildId } = req.params;
+        console.log(req.body)
+console.log(buildId)
         let expense = new ExpenseModel(req.body);
         let rest = await BuildingModel.updateOne({ _id: buildId },
             { $pull: { 'expenses': { $in: [expense._id] } } })
@@ -278,13 +280,38 @@ router.delete("/:delId", authAdmin, async (req, res) => {
     try {
         let delId = req.params.delId;
         let data;
-        data = await CakeModel.deleteOne({ _id: delId });
+        data = await ExpenseModel.deleteOne({ _id: delId });
         res.json(data);
     }
     catch (err) {
         console.log(err);
         res.status(500).json({ msg: "there error try again later", err })
     }
+})
+
+router.get("/:month/:year", authToken, async (req, res) => {
+    let { month, year } = req.params;
+
+    try {
+
+        let data = await ExpenseModel
+
+            .find({
+                $expr: {
+                    $and: [
+                        { $eq: [{ $month: '$date_created' }, month] },
+                        { $eq: [{ $year: '$date_created' }, year] }
+                    ]
+                }
+            })
+            // .populate({ path: 'userId', model: 'users' });
+        res.json(data);
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).json({ msg: "err", err })
+    }
+
 })
 
 module.exports = router;

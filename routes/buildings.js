@@ -3,6 +3,10 @@ const { authAdmin, authToken } = require("../middlewares/auth");
 const { BuildingModel, buildingValid } = require("../models/buildingModel");
 const { UserModel } = require("../models/userModel");
 const router = express.Router();
+const mongoose = require("mongoose");
+const { UsersPaymentModel } = require("../models/usersPaymentModel");
+const { ExpenseModel } = require("../models/expenseModel");
+
 
 router.get("/", async (req, res) => {
     let perPage = Math.min(req.query.perPage, 20) || 4;
@@ -135,6 +139,29 @@ router.delete("/:delId", authAdmin, async (req, res) => {
         console.log(err);
         res.status(500).json({ msg: "there error try again later", err })
     }
+})
+
+router.get("/balance/:buildId", authToken, async (req, res) => {
+    try {
+        const { buildId } = req.params;
+        let result = await UsersPaymentModel.find({buildId:buildId, isPay:true})
+        let price=0;
+        result.forEach(element => {
+            price = price + element.price;
+        });
+
+        let result2 = await ExpenseModel.find({buildId:buildId, isPay:true})
+        let expenses=0;
+        result2.forEach(element => {
+            expenses = expenses + element.price;
+        });
+
+        res.json(price-expenses);
+    } catch (err) {
+        console.log('Error:', err.message);
+    }
+
+
 })
 
 module.exports = router;

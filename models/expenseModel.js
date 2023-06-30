@@ -9,7 +9,7 @@ const expenseSchema = new mongoose.Schema({
     // typeProffesionId: { type: mongoose.ObjectId, default: null },
     // typeExpenseId: { type: mongoose.ObjectId, default: null },
     isConst: { type: Boolean, default: true },
-    buildId: { type: mongoose.ObjectId, default: "" },
+    buildId: { type: mongoose.ObjectId, default: null },
     date_created: { type: Date }
 });
 

@@ -227,6 +227,7 @@ router.post("/:buildId", authAdmin, async (req, res) => {
         let rest = await BuildingModel.updateOne({ _id: buildId },
             { $pull: { 'expenses': { $in: [expense._id] } } })
         await expense.save();
+
         res.status(201).json(expense);
     }
     catch (err) {

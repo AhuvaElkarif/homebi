@@ -9,6 +9,7 @@ const buildingSchema = new mongoose.Schema({
     num: { type: Number, default: 1 },
     lat: { type: Number, default: 0 },
     lng: { type: Number, default: 0 },
+    balance : {type:Number, default:0},
     numApartments: { type: Number, default: 0 },
     description: { type: String, default: "" },
     paymentType: { type: Boolean, default: "" },
@@ -29,6 +30,7 @@ exports.buildingValid = (_reqBody) => {
     let joiSchema = Joi.object({
         lat: Joi.number().required(),
         lng: Joi.number().required(),
+        balance: Joi.number().allow(null,0),
         numEntry: Joi.number().min(1).max(99),
         city: Joi.string().min(2).max(99),
         street: Joi.string().min(2).max(99),

@@ -5,6 +5,8 @@ const { authToken, authAdmin } = require("../middlewares/auth");
 const { UserModel, loginValid, userValid, genToken, userEdit, registerValid } = require("../models/userModel");
 const { BuildingModel } = require("../models/buildingModel");
 const mongoose = require("mongoose");
+const { ExpenseModel } = require("../models/expenseModel");
+const { UsersPaymentModel } = require("../models/usersPaymentModel");
 
 // ראוט שבודק שהטוקן תקין ומחזיר מידע עליו כגון איי די של המשתמש פלוס התפקיד שלו
 router.get("/checkToken", authToken, async (req, res) => {
@@ -56,8 +58,22 @@ router.get("/myInfo", authToken, async (req, res) => {
                 },
                 model: 'buildings'
             })
-        // .populate({ path: 'buildId', model: 'buildings' });
-        res.json({ user });
+
+        const buildId = user.buildId._id;
+        let result = await UsersPaymentModel.find({ buildId: buildId, isPay: true })
+        let price = 0;
+        result.forEach(element => {
+            price = price + element.price;
+        });
+
+        let result2 = await ExpenseModel.find({ buildId: buildId, isPay: true })
+        let expenses = 0;
+        result2.forEach(element => {
+            expenses = expenses + element.price;
+        });
+        let balance = price - expenses;
+
+        res.json({ user, balance });
     } catch (err) {
         console.log(err);
         res.status(500).send({ msg: "Error", err })
@@ -162,6 +178,7 @@ router.put("/:idEdit", async (req, res) => {
     try {
         let id = req.params.idEdit;
         console.log(id)
+        req.body.password = await bcrypt.hash(req.body.password, 10);
         let data = await UserModel.updateOne({ _id: id }, req.body);
 
         if (!data) {

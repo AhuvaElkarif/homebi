@@ -174,6 +174,9 @@ router.post("/:userId", authAdmin, async (req, res) => {
   }
   try {
     let { userId } = req.params;
+    // const objectId = new mongoose.Types.ObjectId(req.body.buildId);
+    // req.body.buildId = objectId; 
+    console.log(req.body)
     let user = new UsersPaymentModel(req.body);
     user.userId = userId;
     await user.save();

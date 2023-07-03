@@ -33,6 +33,7 @@ router.get("/:id", authToken, async (req, res) => {
 
     try {
         let data = await ComplaintModel.find({ userId: req.params.id })
+            .populate({ model: "users", path: "userId" })
             .limit(perPage)
             .skip((page - 1) * perPage)
             .sort({ [sort]: reverse });
@@ -52,6 +53,7 @@ router.get("/byBuild/:id", authToken, async (req, res) => {
 
     try {
         let data = await ComplaintModel.find({ buildId: req.params.id })
+            .populate({ model: "users", path: "userId" })
             .limit(perPage)
             .skip((page - 1) * perPage)
             .sort({ [sort]: reverse });

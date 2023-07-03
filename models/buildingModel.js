@@ -31,7 +31,7 @@ exports.buildingValid = (_reqBody) => {
         lat: Joi.number().required(),
         lng: Joi.number().required(),
         balance: Joi.number().allow(null,0),
-        numEntry: Joi.number().min(1).max(99),
+        numEntry: Joi.number().max(99),
         city: Joi.string().min(2).max(99),
         street: Joi.string().min(2).max(99),
         zipCode: Joi.string().min(2).max(99),

@@ -37,6 +37,7 @@ exports.userValid = (_reqBody) => {
         phone: Joi.string().min(9).max(10).required(),
         price: Joi.number().min(0).required(),
         active: Joi.boolean().allow(null),
+        _id: Joi.string().allow(null),
     });
     return joiSchema.validate(_reqBody);
 }

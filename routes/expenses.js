@@ -3,6 +3,7 @@ const { authAdmin, authToken } = require("../middlewares/auth");
 const { ExpenseModel, expenseValid } = require("../models/expenseModel");
 const { BuildingModel } = require("../models/buildingModel");
 const { UsersPaymentModel } = require("../models/usersPaymentModel");
+const mongoose = require('mongoose');
 const router = express.Router();
 
 router.get("/", authAdmin, async (req, res) => {
@@ -26,18 +27,20 @@ router.get("/", authAdmin, async (req, res) => {
 
 
 
-router.get("/graph", async (req, res) => {
+router.get("/graph/:buildId", async (req, res) => {
     const currentYear = new Date().getFullYear();
-
+    const buildId = new mongoose.Types.ObjectId(req.params.buildId); // Convert buildId to ObjectId
     // Generate an array of month numbers from 1 to 12
     const months = Array.from({ length: 12 }, (_, index) => index + 1);
     ExpenseModel.aggregate([
         {
             $match: {
+                buildId: buildId,
                 date_created: {
                     $gte: new Date(`${currentYear}-01-01`),
                     $lt: new Date(`${currentYear + 1}-01-01`),
                 },
+
             },
         },
         {
@@ -66,15 +69,16 @@ router.get("/graph", async (req, res) => {
 
 
 })
-router.get("/payments", async (req, res) => {
+router.get("/payments/:buildId", async (req, res) => {
     // Create an array of all months in the year
     const currentYear = new Date().getFullYear();
-
+    const buildId = new mongoose.Types.ObjectId(req.params.buildId); // Convert buildId to ObjectId
     const allMonths = Array.from({ length: 12 }, (_, index) => index + 1);
     UsersPaymentModel
         .aggregate([
             {
                 $match: {
+                    buildId: buildId,
                     dateCreated: {
                         $gte: new Date(`${currentYear}-01-01`),
                         $lt: new Date(`${currentYear + 1}-01-01`),
@@ -121,16 +125,17 @@ router.get("/payments", async (req, res) => {
         });
 
 })
-router.get("/pie", async (req, res) => {
+router.get("/pie/:buildId", async (req, res) => {
     try {
 
         // Get the current year
         const currentYear = new Date().getFullYear();
-
+        const buildId = new mongoose.Types.ObjectId(req.params.buildId); // Convert buildId to ObjectId
         // Query expenses for the current year
         const query = ExpenseModel.aggregate([
             {
                 $match: {
+                    buildId: buildId,
                     $expr: {
                         $and: [
                             { $eq: [{ $year: '$date_created' }, currentYear] },

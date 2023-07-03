@@ -169,28 +169,35 @@ router.patch("/changeActive/:id/:buildId", authAdmin, async (req, res) => {
 })
 
 router.put("/:idEdit", async (req, res) => {
+  let validBody = userValid(req.body);
+  if (validBody.error) {
+    return res.status(400).json(validBody.error.details);
+  }
 
-    let validBody = userValid(req.body);
-    if (validBody.error) {
-        res.status(400).json(validBody.error.details);
+  try {
+    let id = req.params.idEdit;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid ID format" });
     }
 
-    try {
-        let id = req.params.idEdit;
-        console.log(id)
-        req.body.password = await bcrypt.hash(req.body.password, 10);
-        let data = await UserModel.updateOne({ _id: id }, req.body);
-
-        if (!data) {
-            return res.status(400).json({ err: "This operation is not enabled !" })
-        }
-
-        res.status(201).json(data);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({ msg: "error", err });
+    if (req.body.password) {
+      req.body.password = await bcrypt.hash(req.body.password, 10);
     }
-})
+
+    let data = await UserModel.findByIdAndUpdate(id, req.body, { new: true });
+
+    if (!data) {
+      return res.status(400).json({ error: "This operation is not enabled!" });
+    }
+
+    res.status(201).json(data);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ msg: "error", err });
+  }
+});
+
 
 router.delete("/:idDel/:buildId", authAdmin, async (req, res) => {
     try {

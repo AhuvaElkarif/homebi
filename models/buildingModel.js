@@ -41,6 +41,7 @@ exports.buildingValid = (_reqBody) => {
         paymentType: Joi.boolean().required(),
         paymentFees: Joi.number().positive().required(),
         images: Joi.array().allow(null, ''),
+        _id: Joi.string().allow(null, ''),
     });
     return joiSchema.validate(_reqBody);
 }

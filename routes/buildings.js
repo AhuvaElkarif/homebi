@@ -3,7 +3,7 @@ const { authAdmin, authToken } = require("../middlewares/auth");
 const { BuildingModel, buildingValid } = require("../models/buildingModel");
 const { UserModel } = require("../models/userModel");
 const router = express.Router();
-const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const { UsersPaymentModel } = require("../models/usersPaymentModel");
 const { ExpenseModel } = require("../models/expenseModel");
 
@@ -59,7 +59,6 @@ router.get("/single/:id", async (req, res) => {
                 },
                 model: 'users'
             })
-            // .populate({ path: 'users', model: 'users' })
             .populate({ path: 'messages', model: 'messages' })
             .populate({ path: 'complaints', model: 'complaints' })
             .populate({ path: 'expenses', model: 'expenses' });
@@ -81,8 +80,10 @@ router.post("/", async (req, res) => {
         let building = new BuildingModel(req.body.building);
         let userAdmin = req.body.manager;
         userAdmin.buildId = building._id;
+        userAdmin.password = await bcrypt.hash(userAdmin.password, 10);
+        console.log(userAdmin)
+        userAdmin.role = "admin";
         let user = new UserModel(userAdmin);
-        user.role = "admin";
         console.log(user)
         await user.save();
         building.userId = user._id;
@@ -109,6 +110,19 @@ router.put("/:editId", authToken, async (req, res) => {
         if (req.tokenData.role == "admin" || id == req.tokenData._id) {
             data = await BuildingModel.updateOne({ _id: editId, userId: req.tokenData._id }, req.body)
         }
+        res.json(data);
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: "there error try again later", err })
+    }
+})
+
+router.put("/changeImages/:editId", authToken, async (req, res) => {
+    try {
+        let editId = req.params.editId;
+        console.log(editId);
+        let data = await BuildingModel.updateOne({ _id: editId }, { $set: { images: req.body } } )
         res.json(data);
     }
     catch (err) {
@@ -144,19 +158,19 @@ router.delete("/:delId", authAdmin, async (req, res) => {
 router.get("/balance/:buildId", authToken, async (req, res) => {
     try {
         const { buildId } = req.params;
-        let result = await UsersPaymentModel.find({buildId:buildId, isPay:true})
-        let price=0;
+        let result = await UsersPaymentModel.find({ buildId: buildId, isPay: true })
+        let price = 0;
         result.forEach(element => {
             price = price + element.price;
         });
 
-        let result2 = await ExpenseModel.find({buildId:buildId, isPay:true})
-        let expenses=0;
+        let result2 = await ExpenseModel.find({ buildId: buildId, isPay: true })
+        let expenses = 0;
         result2.forEach(element => {
             expenses = expenses + element.price;
         });
 
-        res.json(price-expenses);
+        res.json(price - expenses);
     } catch (err) {
         console.log('Error:', err.message);
     }

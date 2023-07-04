@@ -6,17 +6,19 @@ const { UsersPaymentModel } = require("../models/usersPaymentModel");
 const mongoose = require('mongoose');
 const router = express.Router();
 
-router.get("/", authAdmin, async (req, res) => {
+
+router.get("/:id", async (req, res) => {
     let perPage = Math.min(req.query.perPage, 20) || 4;
     let page = req.query.page || 1;
     let sort = req.query.sort || "_id";
     let reverse = req.query.reverse == "yes" ? -1 : 1;
 
     try {
-        let data = await ExpenseModel.find({})
+        let data = await ExpenseModel.find({ buildId: req.params.id })
             .limit(perPage)
             .skip((page - 1) * perPage)
             .sort({ [sort]: reverse })
+            console.log(req.params, data)
         res.json(data);
     }
     catch (err) {
@@ -189,24 +191,6 @@ router.get("/pie/:buildId", async (req, res) => {
     }
 })
 
-router.get("/:id", async (req, res) => {
-    let perPage = Math.min(req.query.perPage, 20) || 4;
-    let page = req.query.page || 1;
-    let sort = req.query.sort || "_id";
-    let reverse = req.query.reverse == "yes" ? -1 : 1;
-
-    try {
-        let data = await ExpenseModel.find({ buildId: req.params.id })
-            .limit(perPage)
-            .skip((page - 1) * perPage)
-            .sort({ [sort]: reverse })
-        res.json(data);
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ msg: "there error try again later", err })
-    }
-})
 
 router.get("/single/:id", async (req, res) => {
     try {
@@ -296,8 +280,8 @@ router.delete("/:delId", authAdmin, async (req, res) => {
     }
 })
 
-router.get("/:month/:year", authToken, async (req, res) => {
-    let { month, year } = req.params;
+router.get("/:month/:year/:buildId", authToken, async (req, res) => {
+    let { month, year, buildId  } = req.params;
 
     try {
 
@@ -307,7 +291,8 @@ router.get("/:month/:year", authToken, async (req, res) => {
                 $expr: {
                     $and: [
                         { $eq: [{ $month: '$date_created' }, month] },
-                        { $eq: [{ $year: '$date_created' }, year] }
+                        { $eq: [{ $year: '$date_created' }, year] },
+                        { $eq: ['$buildId', buildId] } // Add the filter for buildId
                     ]
                 }
             })

@@ -98,28 +98,31 @@ const getPaymentsForYearInBuilding = async (buildingId, year) => {
 
 router.get("/byYear/:year/:buildId", authAdmin, async (req, res) => {
   const { buildId, year } = req.params;
-  
-try {
-  getPaymentsForYearInBuilding(buildId, year);
+
+  try {
+    getPaymentsForYearInBuilding(buildId, year);
 
   }
   catch (err) {
-      console.log(err);
-      res.status(500).json({ msg: "there error try again later", err })
+    console.log(err);
+    res.status(500).json({ msg: "there error try again later", err })
   }
 })
 
-router.get("/:month/:year", authToken, async (req, res) => {
-  let { month, year } = req.params;
+router.get("/:month/:year/:buildId", authToken, async (req, res) => {
+  let { month, year, buildId } = req.params;
 
   try {
     let data = await UsersPaymentModel
-    .find({  $expr: {
-      $and: [
-        { $eq: [{ $month: '$dateCreated' }, month] },
-        { $eq: [{ $year: '$dateCreated' }, year] }
-      ]
-    }})
+      .find({
+        $expr: {
+          $and: [
+            { $eq: [{ $month: '$dateCreated' }, month] },
+            { $eq: [{ $year: '$dateCreated' }, year] },
+            { $eq: ['$buildId', buildId] } // Add the filter for buildId
+          ]
+        }
+      })
       .populate({ path: 'userId', model: 'users' });
     res.json(data);
   }
@@ -228,7 +231,7 @@ router.patch("/changePay/:id", authAdmin, async (req, res) => {
   try {
     let id = req.params.id;
     let data = await UsersPaymentModel.updateOne({ _id: id }
-      ,[{ "$set": { "isPay": { "$eq": [false, "$isPay"] } } }]);
+      , [{ "$set": { "isPay": { "$eq": [false, "$isPay"] } } }]);
     res.json(data);
   }
   catch (err) {
